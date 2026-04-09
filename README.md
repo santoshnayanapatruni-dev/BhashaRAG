@@ -1,7 +1,7 @@
 #VIET College Chatbot – Developer Setup
 
 Visakha Institute of Engineering & Technology  
-Offline Multilingual Chatbot (English + Telugu)
+Offline Multilingual Chatbot (English + Telugu + Hindi)
 
 ---
 
