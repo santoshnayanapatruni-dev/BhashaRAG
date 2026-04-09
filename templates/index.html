@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIET College Enquiry Bot</title>
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="logo-wrap">
+            <img src="/static/images/viet-logo.png" alt="VIET Logo" class="logo-img" />
+          </div>
+          <div class="brand-text">
+            <h1 class="brand-title">Visakha Institute of Engineering &amp; Technology</h1>
+            <p class="brand-subtitle">
+              <svg class="wifi-off-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="1" y1="1" x2="23" y2="23"/>
+                <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
+              </svg>
+              <span id="offline-label">Offline Mode</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="header-controls">
+          <div class="lang-switcher" id="lang-switcher">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="te">తె</button>
+            <button class="lang-btn" data-lang="hi">हि</button>
+          </div>
+          <button class="icon-btn" id="reset-btn" title="New Chat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- CHAT AREA -->
+      <section class="chat-section">
+        <!-- Wallpaper background -->
+        <div class="chat-wallpaper" aria-hidden="true">
+          <img src="/static/images/viet-logo.png" alt="" class="wallpaper-img" draggable="false" />
+        </div>
+
+        <!-- Messages scroll area -->
+        <div class="messages-scroll" id="messages-container">
+          <!-- Messages injected by JS -->
+          <div id="messages-end"></div>
+        </div>
+
+        <!-- Typing indicator -->
+        <div class="typing-indicator hidden" id="typing-indicator">
+          <div class="typing-avatar">
+            <img src="/static/images/viet-logo.png" alt="VIET" />
+          </div>
+          <div class="typing-bubble">
+            <div class="typing-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="typing-label" id="typing-label">VIET Bot is typing</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUICK SUGGESTIONS -->
+      <div class="suggestions-bar" id="suggestions-bar">
+        <p class="suggestions-title" id="suggestions-title">Quick Questions</p>
+        <div class="suggestions-list" id="suggestions-list">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+
+      <!-- OCR OVERLAY -->
+      <div class="ocr-overlay hidden" id="ocr-overlay">
+        <div class="ocr-modal">
+          <!-- Injected by ocr.js -->
+          <div id="ocr-panel-content"></div>
+        </div>
+      </div>
+
+      <!-- INPUT BAR -->
+      <footer class="input-footer">
+        <div class="input-bar">
+          <button class="input-icon-btn ocr-btn" id="ocr-btn" title="OCR Scan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+              <path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+              <rect x="7" y="7" width="10" height="10" rx="1"/>
+            </svg>
+          </button>
+
+          <textarea
+            id="chat-input"
+            rows="1"
+            placeholder="Ask about admissions, fees, courses..."
+          ></textarea>
+
+          <button class="input-icon-btn voice-btn" id="voice-btn" title="Voice Input">
+            <svg id="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+            <svg id="mic-off-icon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="1" y1="1" x2="23" y2="23"/>
+              <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/>
+              <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/>
+              <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+          </button>
+
+          <button class="input-icon-btn send-btn" id="send-btn" title="Send" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+        <p class="footer-note" id="footer-note">RAG + OCR Offline • Telugu &amp; English • VIET 2025-26</p>
+      </footer>
+
+    </main>
+  </div>
+
+  <script src="/static/js/chat.js"></script>
+  <script src="/static/js/ocr.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
